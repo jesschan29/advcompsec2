@@ -1,14 +1,9 @@
 {
-    "version": 3,
+    "version": 2,
     "builds": [
-        { "src": "startGanache.sh", "use": "@vercel/node" },
-        { "src": "server.js", "use": "@vercel/node" }
+        {"src": "server.js", "use": "@vercel/node"}
     ],
     "routes": [
-        { "src": "/server", "dest": "server.js" },
-        { "src": "/startGanache", "dest": "startGanache.sh" }
-    ],
-    "functions": {
-        "startGanache": { "runtime": "bash", "maxDuration": 0 }
-    }
+        {"src": "/(.*)", "dest": "server.js"}
+    ]
 }
