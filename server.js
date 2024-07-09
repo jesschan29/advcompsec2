@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 // Connect to Ganache
-const web3 = new Web3('https://advcompsec2-git-main-jessicas-projects-11605c90.vercel.app:8545'); // Update the URL if necessary
+const web3 = new Web3('https://advcompsec2.vercel.app:8545'); // Update the URL if necessary
 
 const privateKeys = [
     '0x5ad0e06ab82a96d6d4c95b50cff9e56bea6a7afe7b6e955ecd3642f1fcb0baa4',
