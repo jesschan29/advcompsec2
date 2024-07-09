@@ -50,6 +50,7 @@ app.post('/verify', (req, res) => {
     }
 });
 
+
 // Serve index.html
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
