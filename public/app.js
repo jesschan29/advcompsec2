@@ -1,4 +1,4 @@
-const contractAddress = '0xdDeE00f6E47E2E59c5C6d9745C0738013df5Bf78'; // Replace with actual contract address
+const contractAddress = '0xAE754694930ad997cBdB95051EAae8428b0415fd'; // Replace with actual contract address
 // const abi = [
 //     {
 //       "anonymous": false,
@@ -758,7 +758,6 @@ const abi = [
       "type": "function"
     }
   ]
-
 
 // let currentUser = null;
 
