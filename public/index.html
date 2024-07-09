@@ -586,7 +586,7 @@
 </div>
 <script>
     const contractAddress = '0xAE754694930ad997cBdB95051EAae8428b0415fd'; // Replace with actual contract address
-
+    const ganacheUrl = 'https://advcompsec2.vercel.app/';
     const abi = [
         {
         "anonymous": false,
@@ -1137,9 +1137,8 @@
             window.web3 = new Web3(web3.currentProvider);
             console.log("Web3 provider connected");
         } else {
-            console.log("No Web3 provider found, please install MetaMask or use a Web3-enabled browser.");
-            alert("No Web3 provider found, please install MetaMask or use a Web3-enabled browser.");
-            return;
+            window.web3 = new Web3(new Web3.providers.HttpProvider(ganacheUrl));
+            console.log("Connected to Ganache");
         }
 
         const contract = new web3.eth.Contract(abi, contractAddress);
