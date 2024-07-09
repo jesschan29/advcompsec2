@@ -76,11 +76,15 @@ app.get('/start-ganache', (req, res) => {
             }
             if (stderr) {
                 console.error(`stderr: ${stderr}`);
-                res.status(500).send('Error starting Ganache CLI');
+                res.status(500).send('Error starting Ganache CLI - stderr');
                 return;
             }
-            console.log(`Ganache CLI started successfully`);
-            res.send('Ganache CLI started successfully');
+
+            // Successfully started Ganache CLI, parse output for chain ID and RPC URL
+            const { chainId, rpcUrl } = parseGanacheOutput(stdout);
+
+            // Respond with chain ID and RPC URL
+            res.json({ message: 'Ganache CLI started successfully', chainId, rpcUrl });
         });
 });
 
