@@ -1067,21 +1067,8 @@
         openChoicePopup();
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const response = await fetch('/start-ganache');
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.text();
-            console.log(data); // Log response from server
-            alert('Ganache CLI started successfully!'); // Display success message
-        } catch (error) {
-            console.error('Error starting Ganache CLI:', error);
-            alert('Error starting Ganache CLI. Check console for details.'); // Display error message
-        }
-
-        openChoicePopup(); // Call your existing function after Ganache CLI start attempt
+    document.addEventListener("DOMContentLoaded", function() {
+        openChoicePopup();
     });
 
     function openTabs(event, tabName) {
