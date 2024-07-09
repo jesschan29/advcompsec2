@@ -586,7 +586,7 @@
 </div>
 <script>
     const contractAddress = '0xAE754694930ad997cBdB95051EAae8428b0415fd'; // Replace with actual contract address
-    const ganacheUrl = 'https://advcompsec2.vercel.app/';
+
     const abi = [
         {
         "anonymous": false,
@@ -1067,8 +1067,21 @@
         openChoicePopup();
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        openChoicePopup();
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/start-ganache');
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.text();
+            console.log(data); // Log response from server
+            alert('Ganache CLI started successfully!'); // Display success message
+        } catch (error) {
+            console.error('Error starting Ganache CLI:', error);
+            alert('Error starting Ganache CLI. Check console for details.'); // Display error message
+        }
+
+        openChoicePopup(); // Call your existing function after Ganache CLI start attempt
     });
 
     function openTabs(event, tabName) {
@@ -1137,8 +1150,9 @@
             window.web3 = new Web3(web3.currentProvider);
             console.log("Web3 provider connected");
         } else {
-            window.web3 = new Web3(new Web3.providers.HttpProvider(ganacheUrl));
-            console.log("Connected to Ganache");
+            console.log("No Web3 provider found, please install MetaMask or use a Web3-enabled browser.");
+            alert("No Web3 provider found, please install MetaMask or use a Web3-enabled browser.");
+            return;
         }
 
         const contract = new web3.eth.Contract(abi, contractAddress);
