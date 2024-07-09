@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Profile System</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="../app.js"></script>
+    <style>
+        /* Existing CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 5%;
+        }
+        .container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+            padding: 5%;
+            max-width: 800px;
+            border: 1px solid #000;
+        }
+        .header, .edit {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 0 10px 0;
+            margin-bottom: 3%;
+        }
+
+        .edit {
+            border: none;
+        }
+
+        .edit-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .edit-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin:auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .buttons {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #000;
+            border-radius: 50px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .form-popup {
+            display: none;
+            position: fixed;
+            z-index: 9;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .form-container {
+            max-width: 500px;
+            height: auto;
+            padding: 20px;
+            background-color: white;
+            margin: 100px auto;
+            border: 3px solid #f1f1f1;
+            box-sizing: border-box;
+            padding-bottom: 13%;
+            position: relative;
+        }
+
+        .form-container input[type=text],
+        .form-container input[type=password],
+        .form-container input[type=number],
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .form-container input[type=text]:focus, .form-container input[type=password]:focus, .form-container input[type=number], .form-container select:focus {
+            background-color: #ddd;
+            outline: none;
+        }
+        .form-container .btn, .form-container .register {
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            cursor: pointer;
+            width: 48%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        .form-container .btn {
+            background-color: #04AA6D;
+            float: left;
+        }
+        .form-container .register {
+            background-color: #555;
+            float: right;
+        }
+        .form-container .btn:hover, .form-container .register:hover {
+            opacity: 1;
+        }
+        .choice-popup {
+            display: block;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.2s ease-out; /* Animation duration and easing */
+        }
+        .choice-container {
+            max-width: 300px;
+            padding: 20px;
+            background-color: white;
+            margin: 150px auto;
+            text-align: center;
+            border: 3px solid #f1f1f1;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .tab {
+            width: fit-content;
+            display: absolute;
+            left: 5%;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background-color: #f1f1f1;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent, .tabcontent2 {
+            height: fit-content;
+            display: none;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+        }
+
+        .profile-table {
+            width: 730px;
+            border-collapse: collapse;
+        }
+
+        .profile-details1 {
+            padding: 5px 5px 5px 15px;
+            vertical-align: left;
+            text-align: left;
+            width: 100px;
+        }
+
+        .profile-details2 {
+            padding: 5px;
+            vertical-align: left;
+            text-align: left;
+            width: 290px;
+        }
+
+        .profile-image {
+            border-right: 1px solid #000;
+            padding: 5px 5px;
+            vertical-align: middle;
+            width: 170px;
+        }
+
+        .medicalRec {
+            padding: 5px 30px;
+        }
+
+        .info-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .buttonMedRec {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .buttonMedRec:hover {
+            background-color: #45a049;
+        }
+
+        .medRecForm {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .medRecLabel {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .medRecInput, .medRecTextArea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .errorMessage {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            font-size: small;
+        }
+
+        .barcode {
+            max-width: 180px;
+            text-align: center;
+            justify-content: center;
+            vertical-align: middle;
+            margin: 0 auto;
+        }
+
+        .form-help {
+           font-size: 12px;
+           line-height: 0.8;
+           text-align: center;
+        }
+
+        .okcontainer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            text-align: center; 
+        }
+
+        .title{
+            font-weight: bolder;
+            font-size: 15px;
+        }
+
+
+        .form-container2 {
+            max-width: 500px;
+            height: auto;
+            padding: 20px;
+            background-color: white;
+            margin: 100px auto;
+            border: 3px solid #f1f1f1;
+            box-sizing: border-box;
+            padding-bottom: 3%;
+            position: relative;
+        }
+
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="container">
+    <div class="header">
+        <a href="#" class="buttons" onclick="logout()">Logout</a>
+        <button class="btn buttons" onclick="openFormHelp()">Help</button>
+    </div>
+    <div style="display: flex; justify-content: flex-start; width: 100%;">
+        <div class="tab">
+            <button class="tablinks button active" onclick="openTabs(event, 'profile')">Profile</button>
+            <button class="tablinks button" onclick="openTabs(event, 'medical')">Medical Records</button>
+        </div>
+    </div>
+
+    <div style="width: 100%;">
+        <div id="profileSection" class="tabcontent">
+            <h2>Personal Profile Space</h2>
+            <table class="profile-table header">
+                <tbody style="min-width: 100%;">
+                    <tr style="min-width: 100%;">
+                        <td class="profile-image">
+                            <img src="profile.jpg" alt="User Icon">
+                        </td>
+                        <td class="profile-details1">
+                            <div id="profile_name">Full Name: </div>
+                            <div id="profile_gender">Gender: </div>
+                            <div id="profile_age">Age: </div>
+                            <div id="profile_email">Email: </div>
+                            <div id="profile_role">Role: </div>
+                        </td>
+                        <td class="profile-details2">
+                            <!-- <div onsubmit="event.preventDefault(); getProfile();">
+                                <button type="submit">View Profile</button>
+                                <div class="info-box" id="profileInfo"></div> -->
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="medicalSection" class="tabcontent">
+            <h2>Medical Record Space</h2>
+
+            <div class="medicalRec">
+                <!-- View MedicalRecord Form -->
+                <form class="medRecForm" onsubmit="event.preventDefault(); getMedicalRecord();">
+                    <h3>View Medical Record</h3>
+                    <label class="medRecLabel" for="patientName">Patient Email:</label>
+                    <input class="medRecInput" type="text" id="patientName" required>
+                    <button class="buttonMedRec" type="submit">View Medical Records</button>
+                    <button class="buttonMedRec" type="button" onclick="getSelfMedicalRecord()">View Self Medical Records</button>
+                    <div class="info-box" id="medicalRecordInfo"></div>
+                </form>
+
+                <div style="display: flex; justify-content: flex-start; width: 100%;">
+                    <div class="tab">
+                        <button class="tablinks2 button" onclick="openTabs2(event, 'addMedRec')">Add Medical Record</button>
+                        <button class="tablinks2 button" onclick="openTabs2(event, 'editMedRec')">Edit Medical Record</button>
+                        <button class="tablinks2 button" onclick="openTabs2(event, 'deleteMedRec')">Delete Medical Record</button>
+                    </div>
+                </div>
+                <div style="width: 100%;">
+                    <div id="addMedRecSection" class="tabcontent2">
+                        <!-- Add Medical Record Form -->
+                        <form class="medRecForm" onsubmit="event.preventDefault(); addMedicalRecord();">
+                            <h3>Add Medical Record</h3>
+                            <label class="medRecLabel" for="patientNameadd">Patient Email:</label>
+                            <input class="medRecInput" type="text" id="patientNameadd" required>
+                            <label class="medRecLabel" for="addDescription">Description:</label>
+                            <textarea class="medRecTextArea" id="addDescription" rows="3" required></textarea>
+                            <label class="medRecLabel" for="addDate">Date:</label>
+                            <input class="medRecInput" type="date" id="addDate" required>
+                            <label class="medRecLabel" for="addDoctor">Doctor:</label>
+                            <input class="medRecInput" type="text" id="addDoctor" required>
+                            <button class="buttonMedRec" type="submit">Add Medical Record</button>
+                            <div class="info-box" id="addMedicalRecord"></div>
+                        </form>
+                    </div>
+                    <div id="editMedRecSection" class="tabcontent2">
+                        <!-- Edit Medical Record Form -->
+                        <form class="medRecForm" onsubmit="event.preventDefault(); editMedicalRecord();">
+                            <h3>Edit Medical Record</h3>
+                            <label class="medRecLabel" for="patientNameedit">Patient Email:</label>
+                            <input class="medRecInput" type="text" id="patientNameedit" required>
+                            <label class="medRecLabel" for="editRecordId">Record ID:</label>
+                            <input class="medRecInput" type="number" id="editRecordId" required>
+                            <label class="medRecLabel" for="editDescription">Description:</label>
+                            <textarea class="medRecTextArea" id="editDescription" rows="3" required></textarea>
+                            <label class="medRecLabel" for="editDate">Date:</label>
+                            <input class="medRecInput" type="date" id="editDate" required>
+                            <label class="medRecLabel" for="editDoctor">Doctor:</label>
+                            <input class="medRecInput" type="text" id="editDoctor" required>
+                            <button class="buttonMedRec" type="submit">Edit Medical Record</button>
+                            <div class="info-box" id="editMedicalRecord"></div>
+                        </form>
+                    </div>
+                    <div id="deleteMedRecSection" class="tabcontent2">
+                        <!-- Delete Medical Record Form -->
+                        <form class="medRecForm" onsubmit="event.preventDefault(); deleteMedicalRecord();">
+                            <h3>Delete Medical Record</h3>
+                            <label class="medRecLabel" for="patientNamedelete">Patient Email:</label>
+                            <input class="medRecInput" type="text" id="patientNamedelete" required>
+                            <label class="medRecLabel" for="deleteRecordId">Record ID:</label>
+                            <input class="medRecInput" type="number" id="deleteRecordId" required>
+                            <button class="buttonMedRec" type="submit">Delete Medical Record</button>
+                            <div class="info-box" id="deleteMedicalRecord"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="choice-popup" id="choicePopup">
+    <div class="choice-container">
+        <h1>Main Menu</h1>
+        <h2>Choose an Option</h2>
+        <button class="btn buttons" onclick="openFormLogin()">Login</button>
+        <button class="register buttons" onclick="openFormRegister()">Register</button>
+    </div>
+</div>
+
+<div class="form-popup" id="Login">
+    <div class="form-container">
+        <span class="close" onclick="backToChoice()">&times;</span>
+        <h1>Login</h1>
+        <label for="email"><b>Email</b></label>
+        <input type="text" placeholder="Enter Email" name="email" required>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+        <button type="buttons" class="btn" onclick="login()">Login</button>
+        <button type="buttons" class="register" onclick="backToChoice()">Cancel</button>
+        <p id="loginError" style="color:red;display:none;margin-bottom:-60px">Invalid email or password.</p>
+    </div>
+</div>
+
+<div class="form-popup" id="Register">
+    <div class="form-container">
+        <span class="close" onclick="backToChoice()">&times;</span>
+        <h1>Register</h1>
+        <label for="fullName"><b>Full Name</b></label>
+        <input type="text" placeholder="Enter Full Name" name="fullName" required>
+        <p id="fullNameError" class="errorMessage" style="color:red;display:none;">Full Name is required.</p>
+
+        <label for="email"><b>Email</b></label>
+        <input type="text" placeholder="Enter Email" name="email" required>
+        <p id="emailError" class="errorMessage" style="color:red;display:none;">Invalid email format.</p>
+        <p id="emailExistsError" class="errorMessage" style="color:red;display:none;">Email is already registered. Please log in.</p>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+        <p id="passwordError" class="errorMessage" style="color:red;display:none;">Password must be at least 6 characters.</p>
+
+        <label for="confirm-psw"><b>Confirm Password</b></label>
+        <input type="password" placeholder="Confirm Password" name="confirm-psw" required>
+        <p id="registerError" class="errorMessage" style="color:red;display:none;">Passwords do not match.</p>
+
+        <label for="role"><b>Role</b></label>
+        <select name="role" id="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="doctor">Doctor</option>
+            <option value="nurse">Nurse</option>
+            <option value="admin">Admin</option>
+            <option value="patient">Patient</option>
+        </select>
+        <p id="roleError" class="errorMessage" style="color:red;display:none;">Role is required.</p>
+
+        <label for="gender"><b>Gender</b></label>
+        <select name="gender" id="gender" required>
+            <option value="" disabled selected>Select Gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+        </select>
+        <p id="genderError" class="errorMessage" style="color:red;display:none;">Gender is required.</p>
+
+        <label for="age"><b>Age</b></label>
+        <input type="number" placeholder="Enter Age" name="age" required>
+        <p id="ageError" class="errorMessage" style="color:red;display:none;">Enter a valid age.</p>
+
+        <p id="userAccountError" class="errorMessage" style="color:red;display:none;">This Metamask account already registered. Please use another account.</p>
+
+        <button type="buttons" class="btn" onclick="register(), validateGender(), validateRole()">Register</button>
+        <button type="buttons" class="register" onclick="backToChoice()">Cancel</button>
+    </div>
+</div>
+
+<div class="form-popup" id="TwoFactorAuthRegister">
+    <div class="form-container">
+        <h1>Two-Factor Authentication</h1>
+        <h2>Google Authenticator Barcode:</h2>
+        <div id="qrCodeRegister"></div>
+        <p id="setupKeyRegister"></p>
+        <label for="authCodeRegister"><b>Enter Authentication Code</b></label>
+        <input type="text" placeholder="Enter Code" name="authCodeRegister" required>
+        <button type="buttons" class="btn" onclick="verifyAuthCodeRegister()">Verify</button>
+        <button type="buttons" class="register" onclick="cancelAuth()">Cancel</button>
+        <p id="authRegisterError" style="color:red;display:none; margin-bottom:-60px">Invalid authentication code.</p>
+    </div>
+</div>
+
+<div class="form-popup" id="TwoFactorAuthLogin">
+    <div class="form-container">
+        <h1>Two-Factor Authentication</h1>
+        <label for="authCodeLogin"><b>Enter Authentication Code</b></label>
+        <input type="text" placeholder="Enter Code" name="authCodeLogin" required>
+        <button type="buttons" class="btn" onclick="verifyAuthCodeLogin()">Verify</button>
+        <button type="buttons" class="register" onclick="cancelAuth()">Cancel</button>
+        <p id="authLoginError" style="color:red;display:none; margin-bottom:-60px">Invalid authentication code.</p>
+    </div>
+</div>
+
+<div class="form-popup" id="Help">
+    <div class="form-container2">
+        <span class="close" onclick="ok()">&times;</span>
+        <div class='form-help'>
+            <h1>Guidance</h1></br></br>
+            <label class="title"><b>Doctor</b></label>
+            <p>- Able to view self medical record </p>
+            <p>- Able to view patient medical record </p>
+            <p>- Able to add patient medical record </p>
+            <p>- Able to edit patient medical record </p>
+            <p>- Able to delete patient medical record </p></br>
+            <label class="title"><b>Administrator</b></label>
+            <p>- Able to view self medical record </p>
+            <p>- Able to view patient medical record </p>
+            <p>- Able to add patient medical record </p>
+            <p>- Able to edit patient medical record </p>
+            <p>- Able to delete patient medical record </p></br>
+            <label class="title"><b>Nurse</b></label>
+            <p>- Able to view self medical record </p>
+            <p>- Able to view patient medical record </p>
+            <p>- Unable to add patient medical record </p>
+            <p>- Unable to edit patient medical record </p>
+            <p>- Unable to delete patient medical record </p></br>
+            <label class="title"><b>Patient</b></label>
+            <p>- Able to view self medical record </p>
+            <p>- Unble to view patient medical record </p>
+            <p>- Unable to add patient medical record </p>
+            <p>- Unable to edit patient medical record </p>
+            <p>- Unable to delete patient medical record </p></br>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

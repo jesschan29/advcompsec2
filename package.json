@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "speakeasy": "^2.0.0"
+  }
+}
