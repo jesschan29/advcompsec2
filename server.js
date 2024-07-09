@@ -50,6 +50,12 @@ app.post('/verify', (req, res) => {
     }
 });
 
+// Serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
